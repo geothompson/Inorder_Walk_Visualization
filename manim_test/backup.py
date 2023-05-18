@@ -12,14 +12,13 @@ class BinTree(MovingCameraScene):
        a = Text("George")
        b = Text("George").shift(DOWN*2)
        c = Text("George").shift (UP*2)
-       self.add(a)
-       self.wait(1)
-       self.add(a.copy().scale(2))
+       d = VGroup(a, b, c)
+
+
+       self.add(d[0])
+
 
        
-       
-       self.play(a.animate.to_edge(LEFT))
-       self.play(FadeOut(a))
        self.wait(3)
       
 

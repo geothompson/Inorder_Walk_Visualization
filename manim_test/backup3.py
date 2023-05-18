@@ -1,3 +1,4 @@
+from subprocess import call
 from manim import *
 from numpy import array_equiv
 from pyrr.vector3 import create
@@ -44,81 +45,80 @@ class Node:
 
 class Scene(MovingCameraScene):
     def construct(self):
-       tree = Node(5)
+       tree = Node(7)
        tree.insert(4)
-       func_parts_vgroup_list = [self.generate_func_text()]
-       self.display_tree(tree, tree, ORIGIN, ORIGIN+UP*3, 1)
+       tree.insert(5)
+       func = self.generate_func_text()
+       # self.display_tree(tree, tree, ORIGIN, ORIGIN+UP*3, 1)
        global call_count, count
        call_count = Integer()
-       count = -1
+       count = 0
        call_count.to_edge(LEFT).to_edge(DOWN)
        self.add(call_count)
 
-       self.show_in_order(tree, func_parts_vgroup_list)
+       self.show_in_order(tree, tree, [func])
+        # self.play(a.animate.shift(2* left), b.animate.shift(2* up),
+                  # c.animate.shift(2* DOWN), d.animate.shift(2* RIGHT))
 
 
 #``````````````````````````````````````````````````````````````````````#
-    def show_in_order(self, tree, call_stack: list[VGroup]):
+    def show_in_order(self, parent, tree, call_stack: list[VGroup]):
        #counting
        global count
-       
+       global call_count
+       call_count.add_updater(lambda i: i.set_value(count))
+          # self.play(
+                # Create(Line(tree.shape.get_center(),
+                  # tree.left.shape.get_center(), buff=0.3).set_color(BLUE))
+                # )
 
-       
-       call : VGroup = call_stack[len(call_stack)-1]
+       # self.play(new_left.animate.move_to(ORIGIN-DOWN).scale(0.7))
+       # self.play(tree.shape.animate.set_color(WHITE))
 
-       moved = False
+       # self.play(FadeOut(new_left), FadeOut(prev_func))
+       # self.play(prev_func.animate.scale(1).move_to(ORIGIN))
 
-       if count == -1:
-          self.play(Write(call))
-       self.play(call[1].animate.set_color(BLUE))
+
+       call = call_stack[len(call_stack)-1]
+
 
        if tree.left != None:
-          moved = True
-
-          self.play(Create(Line(tree.shape.get_center(),
-            tree.left.shape.get_center(), buff=0.3).set_color(BLUE)))
-          self.remove(tree.left.shape)
-
           count += 1
-          new_call_group = call.copy()
-          new_call_group[0].set_color(WHITE)
-          self.bring_to_back(new_call_group)
-          self.bring_to_front(call)
-          self.play(call[2].animate.set_color(BLUE))
-          self.wait(1.5)
-          self.play(call.animate.to_edge(LEFT).to_edge(DOWN).shift(UP*count*1.5).scale(0.5))
-          call_stack.append(new_call_group)
-
-          self.show_in_order(tree,  call_stack)
-       else:
-          self.play(call[2].animate.set_color(GRAY))
          
+          new_call = call.copy()
+          self.add(new_call)
+          self.play(call.animate.set_color(ORANGE).to_edge(LEFT))
+          call_stack.append(new_call)
+          self.show_in_order(tree, tree.left, call_stack)
+          count -= 1
+          
        call = call_stack.pop()
-       if moved: 
-         self.play(call.animate.move_to(ORIGIN).scale(2))
-       self.play(call[4].animate.set_color(ORANGE))
        
+       self.play(call.animate.move_to(ORIGIN).set_color(RED))
       
        if tree.right != None:
-          count += 1
-          self.play(Create(Line(tree.shape.get_center(),
-             tree.right.shape.get_center(), buff=0.3).set_color(BLUE)))
-          new_call_group = call.copy()
-          new_call_group[0].set_color(WHITE)
-          self.bring_to_back(new_call_group)
-          self.bring_to_front(call)
-          self.play(call[3].animate.set_color(BLUE))
-          self.play(call.animate.to_edge(LEFT).to_edge(DOWN).shift(UP*count*1.5).scale(0.5))
+          # self.play(Create(Line(tree.shape.get_center(),
+          # tree.right.shape.get_center(), buff=0.3).set_color(BLUE)))
+          new_call = call.copy().set_color(WHITE)
+          self.play(new_call.animate.shift(DOWN*2))
+          self.play(call.animate.set_color(GREEN))
+          self.play(Unwrite(call))
+          self.play(new_call.animate.shift(UP*2))
 
-          call_stack.append(new_call_group)
-          self.show_in_order(tree,  call_stack)
-          self.play(call.animate.move_to(ORIGIN).scale(2))
-          self.play(Unwrite(call))
-          self.remove(call)
+          call_stack.append(new_call)
+          self.show_in_order(tree, tree.right, call_stack)
        else:
-          self.play(call[3].animate.set_color(GRAY))
           self.play(Unwrite(call))
-          self.remove(call)
+
+
+
+      
+
+
+
+
+       # self.play(FadeOut(new_right))
+       # self.play(prev_func.animate.scale(1/.3).move_to(ORIGIN))
 
 
           # self.play(Create(Line(tree.shape.get_center(),
@@ -132,15 +132,12 @@ class Scene(MovingCameraScene):
           self.play(Create(Line(parent.get_center(), coord, buff=0.3)))
         # vg =VGroup(text, tree.shape)
        tree.shape.move_to(prev_coord)
-
        self.play(tree.shape.animate.move_to(
           coord), text.animate.move_to(coord))
-
        if tree.left != None:
          self.display_tree(
                tree.shape, tree.left,  coord, coord + DOWN + (LEFT*off), off-0.4
                )
-
        if tree.right != None:
           self.display_tree(
                tree.shape, tree.right, coord, coord + DOWN + (RIGHT*off), off-0.4
@@ -183,22 +180,16 @@ class Scene(MovingCameraScene):
        func_list = [definition, collon, collon2, if_statement, get_left, print_node, get_right]
          
 
-       full_func = VGroup()
-       def_and_if = VGroup(definition, collon, if_statement, collon2)
-       left  = VGroup(get_left)
-       right = VGroup(get_right)
-       print_statement = VGroup(print_node)
+       group = VGroup()
 
-         
 
        for obj in func_list:
-          full_func.add(obj)
+          group.add(obj)
 
-       full_func.scale(0.5)
-       full_func.move_to(ORIGIN)
+       group.scale(0.5)
+       group.move_to(ORIGIN)
                
-       all_vgroups = VGroup(full_func, def_and_if, left, right, print_statement)
-       return all_vgroups
+       return (group)
          
 
        # self.play(Write(group))

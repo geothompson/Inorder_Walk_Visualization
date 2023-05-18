@@ -54,11 +54,11 @@ class Scene(MovingCameraScene):
        call_count.to_edge(LEFT).to_edge(DOWN)
        self.add(call_count)
 
-       self.show_in_order(tree, func_parts_vgroup_list)
+       self.show_in_order(tree, tree, func_parts_vgroup_list)
 
 
 #``````````````````````````````````````````````````````````````````````#
-    def show_in_order(self, tree, call_stack: list[VGroup]):
+    def show_in_order(self, parent, tree, call_stack: list[VGroup]):
        #counting
        global count
        
@@ -70,18 +70,18 @@ class Scene(MovingCameraScene):
 
        if count == -1:
           self.play(Write(call))
-       self.play(call[1].animate.set_color(BLUE))
+       self.play(call[0].animate.set_color(BLUE), call[1].animate.set_color(BLUE))
 
        if tree.left != None:
           moved = True
 
+          ## animate traversel
           self.play(Create(Line(tree.shape.get_center(),
             tree.left.shape.get_center(), buff=0.3).set_color(BLUE)))
-          self.remove(tree.left.shape)
 
           count += 1
           new_call_group = call.copy()
-          new_call_group[0].set_color(WHITE)
+          new_call_group.set_color(WHITE)
           self.bring_to_back(new_call_group)
           self.bring_to_front(call)
           self.play(call[2].animate.set_color(BLUE))
@@ -89,7 +89,7 @@ class Scene(MovingCameraScene):
           self.play(call.animate.to_edge(LEFT).to_edge(DOWN).shift(UP*count*1.5).scale(0.5))
           call_stack.append(new_call_group)
 
-          self.show_in_order(tree,  call_stack)
+          self.show_in_order(tree, tree.left,  call_stack)
        else:
           self.play(call[2].animate.set_color(GRAY))
          
@@ -103,6 +103,7 @@ class Scene(MovingCameraScene):
           count += 1
           self.play(Create(Line(tree.shape.get_center(),
              tree.right.shape.get_center(), buff=0.3).set_color(BLUE)))
+          
           new_call_group = call.copy()
           new_call_group[0].set_color(WHITE)
           self.bring_to_back(new_call_group)
@@ -111,7 +112,7 @@ class Scene(MovingCameraScene):
           self.play(call.animate.to_edge(LEFT).to_edge(DOWN).shift(UP*count*1.5).scale(0.5))
 
           call_stack.append(new_call_group)
-          self.show_in_order(tree,  call_stack)
+          self.show_in_order(tree, tree.right,  call_stack)
           self.play(call.animate.move_to(ORIGIN).scale(2))
           self.play(Unwrite(call))
           self.remove(call)
@@ -121,8 +122,9 @@ class Scene(MovingCameraScene):
           self.remove(call)
 
 
-          # self.play(Create(Line(tree.shape.get_center(),
-          # parent.shape.get_center(), buff=0.3).set_color(GREEN)))
+       self.play(tree.shape.animate.set_color(WHITE))
+       self.play(Create(Line(tree.shape.get_center(),
+       parent.shape.get_center(), buff=0.3).set_color(GREEN)))
 
 
     def display_tree(self, parent, tree, prev_coord, coord, off):
@@ -184,12 +186,6 @@ class Scene(MovingCameraScene):
          
 
        full_func = VGroup()
-       def_and_if = VGroup(definition, collon, if_statement, collon2)
-       left  = VGroup(get_left)
-       right = VGroup(get_right)
-       print_statement = VGroup(print_node)
-
-         
 
        for obj in func_list:
           full_func.add(obj)
@@ -197,8 +193,7 @@ class Scene(MovingCameraScene):
        full_func.scale(0.5)
        full_func.move_to(ORIGIN)
                
-       all_vgroups = VGroup(full_func, def_and_if, left, right, print_statement)
-       return all_vgroups
+       return full_func
          
 
        # self.play(Write(group))

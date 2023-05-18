@@ -50,7 +50,7 @@ class BinTree(MovingCameraScene):
         tree = Node(5)
         tree.insert(1)
         tree.insert(7)
-        func_stack = [generate_func_text(self)]
+        # func_stack = [generate_func_text(self)]
 
         self.display_tree(tree, tree, ORIGIN, ORIGIN+UP*3, 1)
         self.show_in_order(tree, tree)
@@ -86,62 +86,62 @@ class BinTree(MovingCameraScene):
 
         
 
-     def generate_func_text(self):
-         collon  = Text(":", font_size=60)
-         collon2 = Text(":", font_size=60)
+     # def generate_func_text(self):
+         # collon  = Text(":", font_size=60)
+         # collon2 = Text(":", font_size=60)
 
-         definition   = Text("Inorder_Tree_Walk(node)")
-         if_statement = Text("if node != NULL")
-         get_left     = Text("Inorder_Tree_Walk(node.left)")
-         get_right    = Text("Inorder_Tree_Walk(node.right)")
-         print_node   = Text("print(node.data)")
-
-
+         # definition   = Text("Inorder_Tree_Walk(node)")
+         # if_statement = Text("if node != NULL")
+         # get_left     = Text("Inorder_Tree_Walk(node.left)")
+         # get_right    = Text("Inorder_Tree_Walk(node.right)")
+         # print_node   = Text("print(node.data)")
 
 
-         collon.next_to(definition, RIGHT)
 
-         if_statement.shift(DOWN)
-         if_statement.align_to(definition, LEFT)
-         if_statement.shift(RIGHT*1.5)
-         collon2.next_to(if_statement, RIGHT)
 
-        get_left.shift(DOWN*2)
-        get_left.align_to(if_statement, LEFT)
-        get_left.shift(RIGHT*1.5)
+         # collon.next_to(definition, RIGHT)
 
-        print_node.shift(DOWN*3)
-        print_node.align_to(if_statement, LEFT)
-        print_node.shift(RIGHT*1.5)
+         # if_statement.shift(DOWN)
+         # if_statement.align_to(definition, LEFT)
+         # if_statement.shift(RIGHT*1.5)
+         # collon2.next_to(if_statement, RIGHT)
 
-        get_right.shift(DOWN*4)
-        get_right.align_to(if_statement, LEFT)
-        get_right.shift(RIGHT*1.5)
+        # get_left.shift(DOWN*2)
+        # get_left.align_to(if_statement, LEFT)
+        # get_left.shift(RIGHT*1.5)
+
+        # print_node.shift(DOWN*3)
+        # print_node.align_to(if_statement, LEFT)
+        # print_node.shift(RIGHT*1.5)
+
+        # get_right.shift(DOWN*4)
+        # get_right.align_to(if_statement, LEFT)
+        # get_right.shift(RIGHT*1.5)
             
-        func_list = [definition, collon, collon2, if_statement, get_left, print_node, get_right]
+        # func_list = [definition, collon, collon2, if_statement, get_left, print_node, get_right]
             
 
-        group = VGroup()
+        # group = VGroup()
 
 
-        for obj in func_list:
-            group.add(obj)
-          # print(definition) 
+        # for obj in func_list:
+            # group.add(obj)
+          # # print(definition) 
 
-        group.shift(UP*2+LEFT*2).scale(0.6)
+        # group.shift(UP*2+LEFT*2).scale(0.6)
 
-        new_func_list = []
-        new_group = VGroup()
-        for ele in func_list:
-            copy = ele.copy()
-            new_func_list.append(copy)
-            new_group.add(copy)
+        # new_func_list = []
+        # new_group = VGroup()
+        # for ele in func_list:
+            # copy = ele.copy()
+            # new_func_list.append(copy)
+            # new_group.add(copy)
                
-        return ((func_list, group))
+        # return ((func_list, group))
             
 
-       # self.play(Write(group))
-       # self.add(new_group)
+       # # self.play(Write(group))
+       # # self.add(new_group)
 
        # self.play(group.animate.shift(LEFT*3).scale(0.3))
        # self.play(new_group.animate.shift(RIGHT*3).scale(0.3))
